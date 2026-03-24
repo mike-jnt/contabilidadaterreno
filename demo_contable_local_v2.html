@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo contable local</title>
+  <style>
+    :root {
+      --green-900: #0f5132;
+      --green-800: #166534;
+      --green-700: #1f7a4f;
+      --green-600: #2f9e68;
+      --green-100: #e8f7ef;
+      --green-50: #f5fcf8;
+      --border: #d8e6dd;
+      --text: #173124;
+      --muted: #62806f;
+      --danger: #b42318;
+      --warn: #b54708;
+      --ok: #067647;
+      --shadow: 0 12px 28px rgba(17, 24, 39, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #f7fbf8 0%, #eef7f1 100%);
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+      color: #fff;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.4fr 0.8fr;
+      align-items: start;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-box {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .hero-box strong { display:block; margin-bottom: 6px; }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+
+    .tab-btn, .btn, .mini-btn {
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn {
+      padding: 12px 16px;
+      background: #fff;
+      color: var(--green-900);
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn.active {
+      background: var(--green-700);
+      color: #fff;
+      border-color: var(--green-700);
+    }
+
+    .btn {
+      padding: 11px 15px;
+      background: var(--green-700);
+      color: #fff;
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--green-900);
+      border: 1px solid var(--border);
+    }
+
+    .mini-btn {
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--green-900);
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .btn:hover, .tab-btn:hover, .mini-btn:hover { transform: translateY(-1px); }
+    .danger-btn { background: #fee4e2; color: var(--danger); border: 1px solid #fecdca; }
+    .empty-state { padding: 18px; border: 1px dashed var(--border); border-radius: 16px; background: var(--green-50); }
+    .empty-state strong { display:block; margin-bottom: 6px; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 18px;
+    }
+
+    .grid-4, .grid-3, .grid-2 {
+      display: grid;
+      gap: 16px;
+    }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .metric-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .metric-note { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+    .section-head {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-head h2, .section-head h3 {
+      margin: 0;
+      color: var(--green-900);
+    }
+
+    .layout-main {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .purchase-list {
+      display: grid;
+      gap: 10px;
+      max-height: 980px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .purchase-item {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .purchase-item.active {
+      border-color: var(--green-700);
+      box-shadow: 0 0 0 3px rgba(47, 158, 104, 0.10);
+      background: var(--green-50);
+    }
+
+    .purchase-item h4 { margin: 0 0 6px; font-size: 16px; }
+    .purchase-item p { margin: 4px 0; font-size: 13px; color: var(--muted); }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      background: #eef5f0;
+      color: var(--green-900);
+    }
+
+    .badge.ok { background: #e7f8ee; color: var(--ok); }
+    .badge.warn { background: #fff4e5; color: var(--warn); }
+    .badge.danger { background: #ffe9e7; color: var(--danger); }
+
+    .detail-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .stack { display: grid; gap: 16px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text);
+      background: #fff;
+      min-height: 42px;
+    }
+
+    textarea { min-height: 88px; resize: vertical; }
+
+    .field.full { grid-column: 1 / -1; }
+    .field.two { grid-column: span 2; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+
+    .entry-table td:last-child, .entry-table th:last-child,
+    .entry-table td:nth-last-child(2), .entry-table th:nth-last-child(2) {
+      text-align: right;
+    }
+
+    .alert-list, .audit-list, .provider-list, .report-list, .param-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert-item, .audit-item, .provider-item, .report-item, .param-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .subtle {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .split {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .totals-box {
+      background: var(--green-50);
+      border: 1px dashed #bdd8c7;
+      border-radius: 16px;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .totals-row strong { font-size: 16px; }
+
+    .pill-nav {
+      display: inline-flex;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 999px;
+      background: var(--green-100);
+    }
+
+    .pill-nav button {
+      border: 0;
+      background: transparent;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--green-900);
+    }
+
+    .pill-nav button.active {
+      background: var(--green-700);
+      color: #fff;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1180px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-grid, .layout-main, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .hero { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .metric-value { font-size: 24px; }
+      .section-head { align-items: stretch; }
+      .toolbar, .split { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div>
+        <h1>Demo contable local</h1>
+        <p>Versión de prueba para que revises cómo se vería el área contable con IVA, retenciones, documento soporte, parámetros tributarios, asiento automático, cuentas por pagar, reportes, auditoría y alertas. Todo funciona en local y trae ejemplos precargados.</p>
+      </div>
+      <div class="hero-box">
+        <strong>Qué incluye en esta demo</strong>
+        <div class="badge-row">
+          <span class="badge">1. Bloque fiscal</span>
+          <span class="badge">2. Proveedor tributario</span>
+          <span class="badge">3. Parámetros</span>
+          <span class="badge">4. Asiento</span>
+          <span class="badge">5. Causación/Pago</span>
+          <span class="badge">6. Soporte</span>
+          <span class="badge">7. Fondo/Centro</span>
+          <span class="badge">8. Reportes</span>
+          <span class="badge">9. Auditoría</span>
+          <span class="badge">10. Alertas</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="tabs" id="tabs"></div>
+
+    <section class="panel active" data-panel="dashboard">
+      <div class="grid-4" id="dashboardMetrics"></div>
+      <div style="height:16px"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-head">
+            <h3>Compras del mes</h3>
+          </div>
+          <div id="monthlySummary"></div>
+        </div>
+        <div class="card">
+          <div class="section-head">
+            <h3>Alertas contables activas</h3>
+          </div>
+          <div class="alert-list" id="dashboardAlerts"></div>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="section-head"><h3>IVA descontable</h3></div>
+          <div id="ivaBreakdown"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h3>Retenciones del periodo</h3></div>
+          <div id="retentionBreakdown"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h3>Cuentas por pagar</h3></div>
+          <div id="payableBreakdown"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="compras">
+      <div class="layout-main">
+        <div class="card">
+          <div class="section-head">
+            <h2>Compras de ejemplo</h2>
+            <div class="toolbar">
+              <button class="btn secondary" id="newPurchaseBtn">Nuevo registro</button>
+              <button class="btn danger-btn" id="deletePurchaseBtn">Eliminar registro</button>
+              <button class="btn" id="savePurchaseBtn">Guardar</button>
+            </div>
+          </div>
+          <div class="purchase-list" id="purchaseList"></div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="section-head">
+              <h2>Detalle fiscal y contable</h2>
+              <div class="pill-nav" id="purchaseModeTabs">
+                <button data-mode="detalle" class="active">Detalle</button>
+                <button data-mode="asiento">Asiento</button>
+                <button data-mode="auditoria">Auditoría</button>
+              </div>
+            </div>
+            <div id="purchaseContent"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="proveedores">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-head">
+            <h2>Ficha tributaria de proveedores</h2>
+            <div class="toolbar">
+              <button class="btn secondary" id="newProviderBtn">Nuevo proveedor</button>
+            </div>
+          </div>
+          <div class="provider-list" id="providerList"></div>
+        </div>
+        <div class="card">
+          <div class="section-head">
+            <h2>Proveedor seleccionado</h2>
+            <div class="toolbar">
+              <button class="btn danger-btn" id="deleteProviderBtn">Eliminar proveedor</button>
+              <button class="btn" id="saveProviderBtn">Guardar proveedor</button>
+            </div>
+          </div>
+          <div id="providerDetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="parametros">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-head">
+            <h2>Motor de impuestos</h2>
+            <button class="btn" id="savePresetBtn">Guardar preset</button>
+          </div>
+          <div class="param-list" id="presetList"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2>Preset seleccionado</h2></div>
+          <div id="presetDetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="reportes">
+      <div class="section-head">
+        <h2>Reportes contables</h2>
+        <div class="toolbar">
+          <button class="btn" id="exportReportsBtn">Descargar Excel</button>
+        </div>
+      </div>
+      <div class="grid-3" id="reportCards"></div>
+      <div style="height:16px"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-head"><h2>Compras por proveedor</h2></div>
+          <div class="report-list" id="reportBySupplier"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2>Totales por fondo / centro</h2></div>
+          <div class="report-list" id="reportByFund"></div>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+      <div class="card">
+        <div class="section-head"><h2>Reporte mensual</h2></div>
+        <div id="reportMonthlyTable"></div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="alertas">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-head"><h2>Alertas detectadas</h2></div>
+          <div class="alert-list" id="alertsFull"></div>
+        </div>
+        <div class="card">
+          <div class="section-head"><h2>Auditoría reciente</h2></div>
+          <div class="audit-list" id="auditFull"></div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">Esta es una versión local de prueba. Guarda los cambios en tu navegador para que puedas evaluar cómo se sentiría antes de llevarlo a la versión principal.</p>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'demo_contable_local_v2';
+
+    const demoSeed = {
+      providers: [
+        {
+          id: 'prov-001',
+          name: 'Abastecimientos El Olivo SAS',
+          nit: '901234567-8',
+          type: 'Persona jurídica',
+          invoiceObligated: true,
+          ivaResponsible: true,
+          autoretenedor: false,
+          reteivaAgent: true,
+          municipality: 'Bogotá D.C.',
+          email: 'facturacion@olivo.com',
+          phone: '3001234567',
+          comments: 'Proveedor de mercado y aseo.'
+        },
+        {
+          id: 'prov-002',
+          name: 'Servicios Contables María Pérez',
+          nit: '52123456-1',
+          type: 'Persona natural',
+          invoiceObligated: false,
+          ivaResponsible: false,
+          autoretenedor: false,
+          reteivaAgent: false,
+          municipality: 'Bogotá D.C.',
+          email: 'maria.perez@gmail.com',
+          phone: '3115559988',
+          comments: 'Ejemplo para documento soporte a no obligado a facturar.'
+        },
+        {
+          id: 'prov-003',
+          name: 'Ferretería y mantenimiento Vida Nueva',
+          nit: '800556677-2',
+          type: 'Persona jurídica',
+          invoiceObligated: true,
+          ivaResponsible: true,
+          autoretenedor: true,
+          reteivaAgent: false,
+          municipality: 'Soacha',
+          email: 'ventas@vidanueva.com',
+          phone: '3204441200',
+          comments: 'Usado para compras con IVA 19% y reteICA de ejemplo.'
+        }
+      ],
+      presets: [
+        {
+          id: 'pre-001',
+          name: 'Bienes gravados 19%',
+          category: 'Mercado y suministros',
+          ivaRate: 19,
+          retefuenteRate: 2.5,
+          reteivaRate: 15,
+          reteicaRate: 0.966,
+          accountExpense: '519595 - Gastos operacionales',
+          accountIva: '240805 - IVA descontable',
+          accountPayable: '220505 - Proveedores nacionales',
+          accountWithholding: '236540 - Retención en la fuente',
+          accountReteiva: '236801 - Retención IVA',
+          accountReteica: '236815 - ReteICA',
+          notes: 'Preset de ejemplo para compras gravadas.'
+        },
+        {
+          id: 'pre-002',
+          name: 'Honorarios no obligado a facturar',
+          category: 'Servicios',
+          ivaRate: 0,
+          retefuenteRate: 10,
+          reteivaRate: 0,
+          reteicaRate: 0,
+          accountExpense: '511010 - Honorarios',
+          accountIva: '240805 - IVA descontable',
+          accountPayable: '233595 - Cuentas por pagar',
+          accountWithholding: '236540 - Retención en la fuente',
+          accountReteiva: '236801 - Retención IVA',
+          accountReteica: '236815 - ReteICA',
+          notes: 'Ejemplo con documento soporte.'
+        },
+        {
+          id: 'pre-003',
+          name: 'Gasto excluido',
+          category: 'Mantenimiento menor',
+          ivaRate: 0,
+          retefuenteRate: 4,
+          reteivaRate: 0,
+          reteicaRate: 0.966,
+          accountExpense: '513595 - Reparaciones locativas',
+          accountIva: '240805 - IVA descontable',
+          accountPayable: '220505 - Proveedores nacionales',
+          accountWithholding: '236540 - Retención en la fuente',
+          accountReteiva: '236801 - Retención IVA',
+          accountReteica: '236815 - ReteICA',
+          notes: 'Ejemplo de compra sin IVA.'
+        }
+      ],
+      purchases: [
+        {
+          id: 'cmp-001',
+          code: 'COMP-1001',
+          concept: 'Mercado general de domingo',
+          providerId: 'prov-001',
+          presetId: 'pre-001',
+          documentType: 'Factura electrónica',
+          documentNumber: 'FE-45891',
+          cufe: 'CUFE-DEMO-45891',
+          accrualDate: '2026-03-05',
+          invoiceDate: '2026-03-05',
+          dueDate: '2026-03-20',
+          paymentDate: '2026-03-15',
+          paymentStatus: 'Pagada total',
+          paymentMethod: 'Transferencia',
+          fund: 'Ofrenda',
+          costCenter: 'Alimentos / domingo',
+          category: 'Mercado y suministros',
+          supplierSupport: 'factura-mercado.pdf',
+          baseAmount: 850000,
+          ivaRate: 19,
+          retefuenteRate: 2.5,
+          reteivaRate: 15,
+          reteicaRate: 0.966,
+          notes: 'Compra grande del mes con IVA y retenciones completas.',
+          createdBy: 'Admin demo',
+          approvedBy: 'Tesorera demo',
+          paidBy: 'Admin demo',
+          receivedBy: 'Recepción demo',
+          auditTrail: [
+            { date: '2026-03-05 09:15', action: 'Creó el registro contable inicial', user: 'Admin demo' },
+            { date: '2026-03-05 09:22', action: 'Aplicó preset Bienes gravados 19%', user: 'Admin demo' },
+            { date: '2026-03-15 13:05', action: 'Marcó pago total por transferencia', user: 'Tesorera demo' }
+          ]
+        },
+        {
+          id: 'cmp-002',
+          code: 'COMP-1002',
+          concept: 'Honorarios contables marzo',
+          providerId: 'prov-002',
+          presetId: 'pre-002',
+          documentType: 'Documento soporte',
+          documentNumber: 'DS-2026-031',
+          cufe: '',
+          accrualDate: '2026-03-08',
+          invoiceDate: '2026-03-08',
+          dueDate: '2026-03-30',
+          paymentDate: '',
+          paymentStatus: 'Pendiente',
+          paymentMethod: 'Transferencia',
+          fund: 'Pago iglesia',
+          costCenter: 'Administración',
+          category: 'Servicios',
+          supplierSupport: 'doc-soporte-honorarios.pdf',
+          baseAmount: 1200000,
+          ivaRate: 0,
+          retefuenteRate: 10,
+          reteivaRate: 0,
+          reteicaRate: 0,
+          notes: 'Ejemplo de documento soporte para no obligado a facturar.',
+          createdBy: 'Admin demo',
+          approvedBy: 'Pastora demo',
+          paidBy: '',
+          receivedBy: 'Admin demo',
+          auditTrail: [
+            { date: '2026-03-08 11:40', action: 'Registró documento soporte', user: 'Admin demo' },
+            { date: '2026-03-08 11:44', action: 'Dejó pendiente de pago', user: 'Admin demo' }
+          ]
+        },
+        {
+          id: 'cmp-003',
+          code: 'COMP-1003',
+          concept: 'Herramientas y reparación del templo',
+          providerId: 'prov-003',
+          presetId: 'pre-003',
+          documentType: 'Factura electrónica',
+          documentNumber: 'FV-9091',
+          cufe: 'CUFE-DEMO-9091',
+          accrualDate: '2026-03-10',
+          invoiceDate: '2026-03-10',
+          dueDate: '2026-03-18',
+          paymentDate: '2026-03-10',
+          paymentStatus: 'Pagada parcial',
+          paymentMethod: 'Efectivo',
+          fund: 'Pago iglesia',
+          costCenter: 'Mantenimiento',
+          category: 'Mantenimiento menor',
+          supplierSupport: '',
+          baseAmount: 410000,
+          ivaRate: 0,
+          retefuenteRate: 4,
+          reteivaRate: 0,
+          reteicaRate: 0.966,
+          notes: 'Ejemplo con soporte pendiente para disparar alerta.',
+          createdBy: 'Admin demo',
+          approvedBy: 'Admin demo',
+          paidBy: 'Caja menor',
+          receivedBy: 'Compras demo',
+          auditTrail: [
+            { date: '2026-03-10 08:10', action: 'Creó el registro desde compras', user: 'Compras demo' },
+            { date: '2026-03-10 08:30', action: 'Marcó pago parcial en efectivo', user: 'Caja menor' }
+          ]
+        }
+      ]
+    };
+
+    const appState = loadState();
+    const uiState = {
+      activeTab: 'dashboard',
+      selectedPurchaseId: appState.purchases[0]?.id || null,
+      purchaseMode: 'detalle',
+      selectedProviderId: appState.providers[0]?.id || null,
+      selectedPresetId: appState.presets[0]?.id || null
+    };
+
+    const tabs = [
+      { id: 'dashboard', label: 'Panel' },
+      { id: 'compras', label: 'Compras' },
+      { id: 'proveedores', label: 'Proveedores' },
+      { id: 'parametros', label: 'Parámetros' },
+      { id: 'reportes', label: 'Reportes' },
+      { id: 'alertas', label: 'Alertas y auditoría' }
+    ];
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(demoSeed);
+        const parsed = JSON.parse(raw);
+        return mergeSeed(parsed);
+      } catch (error) {
+        console.warn('No se pudo leer el estado local, se carga demo.', error);
+        return structuredClone(demoSeed);
+      }
+    }
+
+    function mergeSeed(parsed) {
+      return {
+        providers: Array.isArray(parsed.providers) && parsed.providers.length ? parsed.providers : structuredClone(demoSeed.providers),
+        presets: Array.isArray(parsed.presets) && parsed.presets.length ? parsed.presets : structuredClone(demoSeed.presets),
+        purchases: Array.isArray(parsed.purchases) && parsed.purchases.length ? parsed.purchases : structuredClone(demoSeed.purchases)
+      };
+    }
+
+    function persistState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    function formatCOP(value) {
+      const numeric = Number(value || 0);
+      return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(numeric);
+    }
+
+    function parseNumber(value) {
+      if (typeof value === 'number') return value;
+      return Number(String(value || '').replace(/[^\d.-]/g, '')) || 0;
+    }
+
+    function computePurchase(purchase) {
+      const base = parseNumber(purchase.baseAmount);
+      const ivaRate = Number(purchase.ivaRate || 0);
+      const retefuenteRate = Number(purchase.retefuenteRate || 0);
+      const reteivaRate = Number(purchase.reteivaRate || 0);
+      const reteicaRate = Number(purchase.reteicaRate || 0);
+      const ivaAmount = Math.round(base * (ivaRate / 100));
+      const grossTotal = base + ivaAmount;
+      const retefuenteAmount = Math.round(base * (retefuenteRate / 100));
+      const reteivaAmount = Math.round(ivaAmount * (reteivaRate / 100));
+      const reteicaAmount = Math.round(base * (reteicaRate / 100));
+      const totalRetentions = retefuenteAmount + reteivaAmount + reteicaAmount;
+      const netPayable = grossTotal - totalRetentions;
+      const paidAmount = purchase.paymentStatus === 'Pagada total'
+        ? netPayable
+        : purchase.paymentStatus === 'Pagada parcial'
+          ? Math.round(netPayable * 0.55)
+          : 0;
+      const balance = netPayable - paidAmount;
+      return {
+        base,
+        ivaRate,
+        retefuenteRate,
+        reteivaRate,
+        reteicaRate,
+        ivaAmount,
+        grossTotal,
+        retefuenteAmount,
+        reteivaAmount,
+        reteicaAmount,
+        totalRetentions,
+        netPayable,
+        paidAmount,
+        balance
+      };
+    }
+
+    function getProvider(providerId) {
+      return appState.providers.find(item => item.id === providerId) || null;
+    }
+
+    function getPreset(presetId) {
+      return appState.presets.find(item => item.id === presetId) || null;
+    }
+
+    function getSelectedPurchase() {
+      return appState.purchases.find(item => item.id === uiState.selectedPurchaseId) || null;
+    }
+
+    function getAlertsForPurchase(purchase) {
+      const provider = getProvider(purchase.providerId);
+      const computed = computePurchase(purchase);
+      const alerts = [];
+      if (!purchase.documentNumber) alerts.push({ severity: 'danger', text: 'No tiene número de soporte o factura.' });
+      if (!purchase.supplierSupport) alerts.push({ severity: 'warn', text: 'No tiene archivo soporte cargado.' });
+      if (!purchase.costCenter || !purchase.fund) alerts.push({ severity: 'warn', text: 'Falta fondo o centro de costo.' });
+      if (purchase.paymentStatus !== 'Pendiente' && !purchase.paymentDate) alerts.push({ severity: 'warn', text: 'Tiene estado de pago sin fecha de pago.' });
+      if (purchase.ivaRate > 0 && provider && !provider.ivaResponsible) alerts.push({ severity: 'danger', text: 'Proveedor marcado como no responsable de IVA pero la compra tiene IVA.' });
+      if (purchase.documentType === 'Documento soporte' && provider?.invoiceObligated) alerts.push({ severity: 'warn', text: 'El proveedor figura como obligado a facturar, revisa el tipo de soporte.' });
+      if (computed.balance > 0 && purchase.dueDate && new Date(purchase.dueDate) < new Date('2026-03-24')) alerts.push({ severity: 'warn', text: 'La obligación está vencida y aún tiene saldo pendiente.' });
+      return alerts;
+    }
+
+    function getAllAlerts() {
+      return appState.purchases.flatMap(purchase => {
+        const provider = getProvider(purchase.providerId);
+        return getAlertsForPurchase(purchase).map(alert => ({
+          purchaseId: purchase.id,
+          code: purchase.code,
+          concept: purchase.concept,
+          provider: provider?.name || 'Sin proveedor',
+          ...alert
+        }));
+      });
+    }
+
+    function getAllAudit() {
+      return appState.purchases
+        .flatMap(purchase => (purchase.auditTrail || []).map(entry => ({ ...entry, purchaseCode: purchase.code, concept: purchase.concept })))
+        .sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function computeTotals() {
+      const purchases = appState.purchases.map(item => ({ item, provider: getProvider(item.providerId), computed: computePurchase(item) }));
+      const totals = {
+        purchases: purchases.length,
+        gross: purchases.reduce((sum, row) => sum + row.computed.grossTotal, 0),
+        iva: purchases.reduce((sum, row) => sum + row.computed.ivaAmount, 0),
+        retefuente: purchases.reduce((sum, row) => sum + row.computed.retefuenteAmount, 0),
+        reteiva: purchases.reduce((sum, row) => sum + row.computed.reteivaAmount, 0),
+        reteica: purchases.reduce((sum, row) => sum + row.computed.reteicaAmount, 0),
+        net: purchases.reduce((sum, row) => sum + row.computed.netPayable, 0),
+        paid: purchases.reduce((sum, row) => sum + row.computed.paidAmount, 0),
+        balance: purchases.reduce((sum, row) => sum + row.computed.balance, 0)
+      };
+      return { purchases, totals };
+    }
+
+    function groupBy(rows, keyGetter) {
+      return rows.reduce((acc, row) => {
+        const key = keyGetter(row);
+        acc[key] = acc[key] || [];
+        acc[key].push(row);
+        return acc;
+      }, {});
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('tabs');
+      container.innerHTML = tabs.map(tab => `
+        <button class="tab-btn ${uiState.activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}">${tab.label}</button>
+      `).join('');
+      container.querySelectorAll('[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          uiState.activeTab = btn.dataset.tab;
+          document.querySelectorAll('.panel').forEach(panel => {
+            panel.classList.toggle('active', panel.dataset.panel === uiState.activeTab);
+          });
+          renderTabs();
+        });
+      });
+    }
+
+    function renderDashboard() {
+      const { purchases, totals } = computeTotals();
+      document.getElementById('dashboardMetrics').innerHTML = `
+        <div class="card"><div class="metric-title">Compras registradas</div><div class="metric-value">${totals.purchases}</div><div class="metric-note">Ejemplos precargados para revisar flujo completo.</div></div>
+        <div class="card"><div class="metric-title">Total bruto</div><div class="metric-value">${formatCOP(totals.gross)}</div><div class="metric-note">Base + IVA antes de retenciones.</div></div>
+        <div class="card"><div class="metric-title">Total neto a pagar</div><div class="metric-value">${formatCOP(totals.net)}</div><div class="metric-note">Después de retefuente, reteIVA y reteICA.</div></div>
+        <div class="card"><div class="metric-title">Saldo pendiente</div><div class="metric-value">${formatCOP(totals.balance)}</div><div class="metric-note">Separado de la causación para ver cuentas por pagar.</div></div>
+      `;
+
+      document.getElementById('monthlySummary').innerHTML = `
+        <div class="totals-box">
+          <div class="totals-row"><span>Base gravable</span><strong>${formatCOP(purchases.reduce((sum, row) => sum + row.computed.base, 0))}</strong></div>
+          <div class="totals-row"><span>IVA descontable</span><strong>${formatCOP(totals.iva)}</strong></div>
+          <div class="totals-row"><span>Retenciones</span><strong>${formatCOP(totals.retefuente + totals.reteiva + totals.reteica)}</strong></div>
+          <div class="totals-row"><span>Pagado</span><strong>${formatCOP(totals.paid)}</strong></div>
+          <div class="totals-row"><span>Por pagar</span><strong>${formatCOP(totals.balance)}</strong></div>
+        </div>
+      `;
+
+      const allAlerts = getAllAlerts();
+      document.getElementById('dashboardAlerts').innerHTML = allAlerts.length
+        ? allAlerts.slice(0, 6).map(alert => `
+          <div class="alert-item">
+            <div class="split">
+              <strong>${alert.code}</strong>
+              <span class="badge ${alert.severity}">${alert.severity === 'danger' ? 'Alta' : 'Media'}</span>
+            </div>
+            <div class="subtle">${alert.concept} · ${alert.provider}</div>
+            <div style="margin-top:6px">${alert.text}</div>
+          </div>
+        `).join('')
+        : '<div class="subtle">No hay alertas activas.</div>';
+
+      document.getElementById('ivaBreakdown').innerHTML = `
+        <div class="totals-box">
+          <div class="totals-row"><span>IVA 19%</span><strong>${formatCOP(purchases.filter(row => row.item.ivaRate === 19).reduce((sum, row) => sum + row.computed.ivaAmount, 0))}</strong></div>
+          <div class="totals-row"><span>IVA 5%</span><strong>${formatCOP(purchases.filter(row => row.item.ivaRate === 5).reduce((sum, row) => sum + row.computed.ivaAmount, 0))}</strong></div>
+          <div class="totals-row"><span>Sin IVA / Excluido</span><strong>${formatCOP(purchases.filter(row => row.item.ivaRate === 0).reduce((sum, row) => sum + row.computed.base, 0))}</strong></div>
+        </div>
+      `;
+
+      document.getElementById('retentionBreakdown').innerHTML = `
+        <div class="totals-box">
+          <div class="totals-row"><span>ReteFuente</span><strong>${formatCOP(totals.retefuente)}</strong></div>
+          <div class="totals-row"><span>ReteIVA</span><strong>${formatCOP(totals.reteiva)}</strong></div>
+          <div class="totals-row"><span>ReteICA</span><strong>${formatCOP(totals.reteica)}</strong></div>
+        </div>
+      `;
+
+      const payables = purchases.filter(row => row.computed.balance > 0);
+      document.getElementById('payableBreakdown').innerHTML = payables.length ? `
+        <div class="report-list">
+          ${payables.map(row => `
+            <div class="report-item">
+              <div class="split"><strong>${row.item.code}</strong><strong>${formatCOP(row.computed.balance)}</strong></div>
+              <div class="subtle">${row.item.concept} · Vence ${row.item.dueDate || 'sin fecha'}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<div class="subtle">No hay cuentas por pagar pendientes.</div>';
+    }
+
+    function renderPurchaseList() {
+      const container = document.getElementById('purchaseList');
+      if (!appState.purchases.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <strong>No hay registros contables.</strong>
+            <div class="subtle">Crea un nuevo registro para probar IVA, retenciones y flujo de pago.</div>
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = appState.purchases.map(purchase => {
+        const provider = getProvider(purchase.providerId);
+        const computed = computePurchase(purchase);
+        return `
+          <div class="purchase-item ${purchase.id === uiState.selectedPurchaseId ? 'active' : ''}" data-purchase-id="${purchase.id}">
+            <h4>${purchase.code}</h4>
+            <p><strong>${purchase.concept}</strong></p>
+            <p>${provider?.name || 'Sin proveedor'} · ${purchase.documentType}</p>
+            <p>Neto a pagar: <strong>${formatCOP(computed.netPayable)}</strong></p>
+            <div class="badge-row">
+              <span class="badge">${purchase.paymentStatus}</span>
+              <span class="badge ${getAlertsForPurchase(purchase).length ? 'warn' : 'ok'}">${getAlertsForPurchase(purchase).length ? getAlertsForPurchase(purchase).length + ' alerta(s)' : 'Sin alertas'}</span>
+              <span class="badge">${purchase.fund}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('[data-purchase-id]').forEach(item => {
+        item.addEventListener('click', () => {
+          uiState.selectedPurchaseId = item.dataset.purchaseId;
+          renderPurchaseList();
+          renderPurchaseDetail();
+        });
+      });
+    }
+
+    function purchaseDetailForm(purchase) {
+      const providerOptions = appState.providers.map(provider => `<option value="${provider.id}" ${provider.id === purchase.providerId ? 'selected' : ''}>${provider.name}</option>`).join('');
+      const presetOptions = appState.presets.map(preset => `<option value="${preset.id}" ${preset.id === purchase.presetId ? 'selected' : ''}>${preset.name}</option>`).join('');
+      const provider = getProvider(purchase.providerId);
+      const computed = computePurchase(purchase);
+      const alerts = getAlertsForPurchase(purchase);
+      return `
+        <div class="detail-grid">
+          <div class="stack">
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>1. Bloque fiscal y documento</h3></div>
+              <div class="form-grid" id="purchaseFormGrid">
+                <div class="field"><label>Código</label><input data-field="code" value="${purchase.code}" /></div>
+                <div class="field two"><label>Concepto</label><input data-field="concept" value="${purchase.concept}" /></div>
+                <div class="field"><label>Proveedor</label><select data-field="providerId">${providerOptions}</select></div>
+                <div class="field"><label>Preset tributario</label><select data-field="presetId">${presetOptions}</select></div>
+                <div class="field"><label>Tipo de documento</label>
+                  <select data-field="documentType">
+                    ${['Factura electrónica','Documento equivalente','Documento soporte'].map(type => `<option value="${type}" ${purchase.documentType === type ? 'selected' : ''}>${type}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field"><label>Número documento</label><input data-field="documentNumber" value="${purchase.documentNumber || ''}" /></div>
+                <div class="field"><label>CUFE/CUDS</label><input data-field="cufe" value="${purchase.cufe || ''}" /></div>
+                <div class="field"><label>Fecha causación</label><input type="date" data-field="accrualDate" value="${purchase.accrualDate || ''}" /></div>
+                <div class="field"><label>Fecha factura</label><input type="date" data-field="invoiceDate" value="${purchase.invoiceDate || ''}" /></div>
+                <div class="field"><label>Fecha vencimiento</label><input type="date" data-field="dueDate" value="${purchase.dueDate || ''}" /></div>
+                <div class="field"><label>Fecha pago</label><input type="date" data-field="paymentDate" value="${purchase.paymentDate || ''}" /></div>
+                <div class="field"><label>Estado de pago</label>
+                  <select data-field="paymentStatus">
+                    ${['Pendiente','Pagada parcial','Pagada total','Anulada'].map(status => `<option value="${status}" ${purchase.paymentStatus === status ? 'selected' : ''}>${status}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field"><label>Método de pago</label>
+                  <select data-field="paymentMethod">
+                    ${['Transferencia','Tarjeta','Efectivo','Caja menor'].map(method => `<option value="${method}" ${purchase.paymentMethod === method ? 'selected' : ''}>${method}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field"><label>Fondo</label>
+                  <select data-field="fund">
+                    ${['Ofrenda','Pago iglesia','Donación dirigida','Caja menor'].map(fund => `<option value="${fund}" ${purchase.fund === fund ? 'selected' : ''}>${fund}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field"><label>Centro de costo</label><input data-field="costCenter" value="${purchase.costCenter || ''}" /></div>
+                <div class="field"><label>Archivo soporte</label><input data-field="supplierSupport" value="${purchase.supplierSupport || ''}" placeholder="ejemplo.pdf" /></div>
+                <div class="field"><label>Base gravable</label><input data-money="baseAmount" value="${formatCOP(purchase.baseAmount)}" /></div>
+                <div class="field"><label>IVA %</label><input data-number="ivaRate" value="${purchase.ivaRate}" /></div>
+                <div class="field"><label>ReteFuente %</label><input data-number="retefuenteRate" value="${purchase.retefuenteRate}" /></div>
+                <div class="field"><label>ReteIVA % del IVA</label><input data-number="reteivaRate" value="${purchase.reteivaRate}" /></div>
+                <div class="field"><label>ReteICA %</label><input data-number="reteicaRate" value="${purchase.reteicaRate}" /></div>
+                <div class="field full"><label>Observaciones</label><textarea data-field="notes">${purchase.notes || ''}</textarea></div>
+              </div>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>5. Causación vs pago</h3></div>
+              <div class="grid-3">
+                <div class="totals-box"><div class="metric-title">Valor causado</div><strong>${formatCOP(computed.netPayable)}</strong><div class="subtle">Total reconocido contablemente.</div></div>
+                <div class="totals-box"><div class="metric-title">Pagado</div><strong>${formatCOP(computed.paidAmount)}</strong><div class="subtle">Según estado y fecha de pago.</div></div>
+                <div class="totals-box"><div class="metric-title">Saldo</div><strong>${formatCOP(computed.balance)}</strong><div class="subtle">Cuenta por pagar pendiente.</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>Resumen tributario</h3></div>
+              <div class="totals-box">
+                <div class="totals-row"><span>Proveedor</span><strong>${provider?.name || 'Sin proveedor'}</strong></div>
+                <div class="totals-row"><span>NIT</span><strong>${provider?.nit || 'Sin NIT'}</strong></div>
+                <div class="totals-row"><span>Base</span><strong>${formatCOP(computed.base)}</strong></div>
+                <div class="totals-row"><span>IVA</span><strong>${formatCOP(computed.ivaAmount)}</strong></div>
+                <div class="totals-row"><span>ReteFuente</span><strong>${formatCOP(computed.retefuenteAmount)}</strong></div>
+                <div class="totals-row"><span>ReteIVA</span><strong>${formatCOP(computed.reteivaAmount)}</strong></div>
+                <div class="totals-row"><span>ReteICA</span><strong>${formatCOP(computed.reteicaAmount)}</strong></div>
+                <div class="totals-row"><span>Neto a pagar</span><strong>${formatCOP(computed.netPayable)}</strong></div>
+              </div>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>10. Alertas</h3></div>
+              ${alerts.length ? `<div class="alert-list">${alerts.map(alert => `<div class="alert-item"><span class="badge ${alert.severity}">${alert.severity === 'danger' ? 'Alta' : 'Media'}</span><div style="margin-top:8px">${alert.text}</div></div>`).join('')}</div>` : '<div class="subtle">Sin alertas para este registro.</div>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function purchaseEntryView(purchase) {
+      const provider = getProvider(purchase.providerId);
+      const preset = getPreset(purchase.presetId);
+      const computed = computePurchase(purchase);
+      return `
+        <div class="stack">
+          <div class="card" style="padding:16px">
+            <div class="section-head"><h3>4. Comprobante contable automático</h3></div>
+            <table class="entry-table">
+              <thead><tr><th>Cuenta</th><th>Detalle</th><th>Débito</th><th>Crédito</th></tr></thead>
+              <tbody>
+                <tr><td>${preset?.accountExpense || 'Cuenta gasto'}</td><td>${purchase.concept}</td><td>${formatCOP(computed.base)}</td><td></td></tr>
+                <tr><td>${preset?.accountIva || 'IVA descontable'}</td><td>IVA compra ${provider?.name || ''}</td><td>${formatCOP(computed.ivaAmount)}</td><td></td></tr>
+                <tr><td>${preset?.accountPayable || 'Proveedores'}</td><td>${provider?.name || ''}</td><td></td><td>${formatCOP(computed.grossTotal)}</td></tr>
+                <tr><td>${preset?.accountWithholding || 'Retefuente'}</td><td>Retención practicada</td><td>${formatCOP(computed.retefuenteAmount)}</td><td></td></tr>
+                <tr><td>${preset?.accountReteiva || 'ReteIVA'}</td><td>Retención IVA</td><td>${formatCOP(computed.reteivaAmount)}</td><td></td></tr>
+                <tr><td>${preset?.accountReteica || 'ReteICA'}</td><td>Retención ICA</td><td>${formatCOP(computed.reteicaAmount)}</td><td></td></tr>
+              </tbody>
+            </table>
+            <p class="subtle" style="margin-top:12px">Ejemplo visual del asiento que podría generarse automáticamente. Aquí ves por qué este bloque le ahorra trabajo al contador.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>6. Documento y soporte</h3></div>
+              <div class="totals-box">
+                <div class="totals-row"><span>Tipo</span><strong>${purchase.documentType}</strong></div>
+                <div class="totals-row"><span>Número</span><strong>${purchase.documentNumber || 'Pendiente'}</strong></div>
+                <div class="totals-row"><span>CUFE/CUDS</span><strong>${purchase.cufe || 'No aplica'}</strong></div>
+                <div class="totals-row"><span>Archivo</span><strong>${purchase.supplierSupport || 'Pendiente'}</strong></div>
+              </div>
+            </div>
+            <div class="card" style="padding:16px">
+              <div class="section-head"><h3>7. Clasificación</h3></div>
+              <div class="totals-box">
+                <div class="totals-row"><span>Fondo</span><strong>${purchase.fund || 'Pendiente'}</strong></div>
+                <div class="totals-row"><span>Centro de costo</span><strong>${purchase.costCenter || 'Pendiente'}</strong></div>
+                <div class="totals-row"><span>Método pago</span><strong>${purchase.paymentMethod || 'Pendiente'}</strong></div>
+                <div class="totals-row"><span>Categoría</span><strong>${purchase.category || 'Pendiente'}</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function purchaseAuditView(purchase) {
+      const provider = getProvider(purchase.providerId);
+      return `
+        <div class="grid-2">
+          <div class="card" style="padding:16px">
+            <div class="section-head"><h3>9. Trazabilidad</h3></div>
+            <div class="totals-box">
+              <div class="totals-row"><span>Creó</span><strong>${purchase.createdBy || 'Pendiente'}</strong></div>
+              <div class="totals-row"><span>Aprobó</span><strong>${purchase.approvedBy || 'Pendiente'}</strong></div>
+              <div class="totals-row"><span>Pagó</span><strong>${purchase.paidBy || 'Pendiente'}</strong></div>
+              <div class="totals-row"><span>Recibió</span><strong>${purchase.receivedBy || 'Pendiente'}</strong></div>
+              <div class="totals-row"><span>Proveedor</span><strong>${provider?.name || 'Pendiente'}</strong></div>
+            </div>
+          </div>
+          <div class="card" style="padding:16px">
+            <div class="section-head"><h3>Historial de cambios</h3></div>
+            <div class="audit-list">
+              ${(purchase.auditTrail || []).map(entry => `
+                <div class="audit-item">
+                  <div class="split"><strong>${entry.action}</strong><span class="badge">${entry.user}</span></div>
+                  <div class="subtle">${entry.date}</div>
+                </div>
+              `).join('') || '<div class="subtle">Aún no hay movimientos.</div>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPurchaseDetail() {
+      const purchase = getSelectedPurchase();
+      const content = document.getElementById('purchaseContent');
+      if (!purchase) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <strong>No hay un registro seleccionado.</strong>
+            <div class="subtle">Crea uno nuevo o selecciona un registro de la lista.</div>
+          </div>
+        `;
+        renderPurchaseModeTabs();
+        return;
+      }
+      if (uiState.purchaseMode === 'detalle') content.innerHTML = purchaseDetailForm(purchase);
+      if (uiState.purchaseMode === 'asiento') content.innerHTML = purchaseEntryView(purchase);
+      if (uiState.purchaseMode === 'auditoria') content.innerHTML = purchaseAuditView(purchase);
+      bindPurchaseDetailEvents();
+      renderPurchaseModeTabs();
+    }
+
+    function renderPurchaseModeTabs() {
+      const container = document.getElementById('purchaseModeTabs');
+      container.querySelectorAll('button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === uiState.purchaseMode);
+        btn.onclick = () => {
+          uiState.purchaseMode = btn.dataset.mode;
+          renderPurchaseDetail();
+        };
+      });
+    }
+
+    function bindPurchaseDetailEvents() {
+      const purchase = getSelectedPurchase();
+      if (!purchase) return;
+      const detailRoot = document.getElementById('purchaseContent');
+      detailRoot.querySelectorAll('[data-field]').forEach(input => {
+        input.addEventListener('input', () => {
+          purchase[input.dataset.field] = input.value;
+          if (input.dataset.field === 'providerId') {
+            const provider = getProvider(purchase.providerId);
+            if (provider) purchase.category = purchase.category || 'General';
+          }
+        });
+      });
+      detailRoot.querySelectorAll('[data-number]').forEach(input => {
+        input.addEventListener('input', () => {
+          purchase[input.dataset.number] = parseFloat(input.value) || 0;
+          renderPurchaseDetail();
+        });
+      });
+      detailRoot.querySelectorAll('[data-money]').forEach(input => {
+        input.addEventListener('input', () => {
+          const numeric = parseNumber(input.value);
+          purchase[input.dataset.money] = numeric;
+          input.value = numeric ? formatCOP(numeric) : '';
+          renderPurchaseDetail();
+        });
+      });
+      const presetSelect = detailRoot.querySelector('[data-field="presetId"]');
+      if (presetSelect) {
+        presetSelect.addEventListener('change', () => {
+          applyPresetToPurchase(purchase, presetSelect.value, true);
+          renderAll();
+        });
+      }
+    }
+
+    function applyPresetToPurchase(purchase, presetId, addAudit = false) {
+      const preset = getPreset(presetId);
+      if (!preset) return;
+      purchase.presetId = preset.id;
+      purchase.category = preset.category;
+      purchase.ivaRate = preset.ivaRate;
+      purchase.retefuenteRate = preset.retefuenteRate;
+      purchase.reteivaRate = preset.reteivaRate;
+      purchase.reteicaRate = preset.reteicaRate;
+      if (addAudit) {
+        purchase.auditTrail = purchase.auditTrail || [];
+        purchase.auditTrail.unshift({
+          date: currentTimestamp(),
+          action: `Aplicó preset ${preset.name}`,
+          user: 'Usuario local'
+        });
+      }
+    }
+
+    function renderProviders() {
+      const list = document.getElementById('providerList');
+      if (!appState.providers.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <strong>No hay proveedores creados.</strong>
+            <div class="subtle">Agrega uno nuevo para vincularlo a las compras.</div>
+          </div>
+        `;
+      } else {
+        list.innerHTML = appState.providers.map(provider => `
+          <div class="provider-item ${provider.id === uiState.selectedProviderId ? 'active' : ''}" data-provider-id="${provider.id}" style="cursor:pointer">
+            <div class="split"><strong>${provider.name}</strong><span class="badge">${provider.nit || 'Sin NIT'}</span></div>
+            <div class="subtle">${provider.type} · ${provider.municipality}</div>
+            <div class="badge-row">
+              <span class="badge ${provider.invoiceObligated ? 'ok' : 'warn'}">${provider.invoiceObligated ? 'Factura' : 'No factura'}</span>
+              <span class="badge ${provider.ivaResponsible ? 'ok' : 'warn'}">${provider.ivaResponsible ? 'Responsable IVA' : 'No responsable IVA'}</span>
+            </div>
+          </div>
+        `).join('');
+        list.querySelectorAll('[data-provider-id]').forEach(item => {
+          item.addEventListener('click', () => {
+            uiState.selectedProviderId = item.dataset.providerId;
+            renderProviders();
+          });
+        });
+      }
+
+      const provider = getProvider(uiState.selectedProviderId) || appState.providers[0] || null;
+      if (!provider && uiState.selectedProviderId) uiState.selectedProviderId = null;
+      const detail = document.getElementById('providerDetail');
+      if (!provider) {
+        detail.innerHTML = `
+          <div class="empty-state">
+            <strong>No hay proveedor seleccionado.</strong>
+            <div class="subtle">Usa “Nuevo proveedor” para empezar.</div>
+          </div>
+        `;
+        return;
+      }
+      detail.innerHTML = `
+        <div class="form-grid" id="providerForm">
+          <div class="field two"><label>Razón social</label><input data-provider-field="name" value="${provider.name}" /></div>
+          <div class="field"><label>NIT</label><input data-provider-field="nit" value="${provider.nit || ''}" /></div>
+          <div class="field"><label>Tipo de tercero</label>
+            <select data-provider-field="type">
+              ${['Persona jurídica','Persona natural'].map(type => `<option value="${type}" ${provider.type === type ? 'selected' : ''}>${type}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label>Obligado a facturar</label>
+            <select data-provider-bool="invoiceObligated">
+              <option value="true" ${provider.invoiceObligated ? 'selected' : ''}>Sí</option>
+              <option value="false" ${!provider.invoiceObligated ? 'selected' : ''}>No</option>
+            </select>
+          </div>
+          <div class="field"><label>Responsable IVA</label>
+            <select data-provider-bool="ivaResponsible">
+              <option value="true" ${provider.ivaResponsible ? 'selected' : ''}>Sí</option>
+              <option value="false" ${!provider.ivaResponsible ? 'selected' : ''}>No</option>
+            </select>
+          </div>
+          <div class="field"><label>Autorretenedor</label>
+            <select data-provider-bool="autoretenedor">
+              <option value="true" ${provider.autoretenedor ? 'selected' : ''}>Sí</option>
+              <option value="false" ${!provider.autoretenedor ? 'selected' : ''}>No</option>
+            </select>
+          </div>
+          <div class="field"><label>Agente reteIVA</label>
+            <select data-provider-bool="reteivaAgent">
+              <option value="true" ${provider.reteivaAgent ? 'selected' : ''}>Sí</option>
+              <option value="false" ${!provider.reteivaAgent ? 'selected' : ''}>No</option>
+            </select>
+          </div>
+          <div class="field"><label>Municipio ICA</label><input data-provider-field="municipality" value="${provider.municipality || ''}" /></div>
+          <div class="field"><label>Correo</label><input data-provider-field="email" value="${provider.email || ''}" /></div>
+          <div class="field"><label>Teléfono</label><input data-provider-field="phone" value="${provider.phone || ''}" /></div>
+          <div class="field full"><label>Observaciones</label><textarea data-provider-field="comments">${provider.comments || ''}</textarea></div>
+        </div>
+      `;
+      detail.querySelectorAll('[data-provider-field]').forEach(input => {
+        input.addEventListener('input', () => {
+          provider[input.dataset.providerField] = input.value;
+        });
+      });
+      detail.querySelectorAll('[data-provider-bool]').forEach(select => {
+        select.addEventListener('change', () => {
+          provider[select.dataset.providerBool] = select.value === 'true';
+        });
+      });
+    }
+
+    function renderPresets() {
+      const list = document.getElementById('presetList');
+      list.innerHTML = appState.presets.map(preset => `
+        <div class="param-item" data-preset-id="${preset.id}" style="cursor:pointer; border-color:${preset.id === uiState.selectedPresetId ? '#2f9e68' : 'var(--border)'}">
+          <div class="split"><strong>${preset.name}</strong><span class="badge">${preset.category}</span></div>
+          <div class="subtle">IVA ${preset.ivaRate}% · RF ${preset.retefuenteRate}% · RIVA ${preset.reteivaRate}% · RICA ${preset.reteicaRate}%</div>
+        </div>
+      `).join('');
+      list.querySelectorAll('[data-preset-id]').forEach(item => {
+        item.addEventListener('click', () => {
+          uiState.selectedPresetId = item.dataset.presetId;
+          renderPresets();
+        });
+      });
+      const preset = getPreset(uiState.selectedPresetId) || appState.presets[0];
+      const detail = document.getElementById('presetDetail');
+      detail.innerHTML = `
+        <div class="form-grid" id="presetForm">
+          <div class="field two"><label>Nombre</label><input data-preset-field="name" value="${preset.name}" /></div>
+          <div class="field"><label>Categoría</label><input data-preset-field="category" value="${preset.category || ''}" /></div>
+          <div class="field"><label>IVA %</label><input data-preset-number="ivaRate" value="${preset.ivaRate}" /></div>
+          <div class="field"><label>ReteFuente %</label><input data-preset-number="retefuenteRate" value="${preset.retefuenteRate}" /></div>
+          <div class="field"><label>ReteIVA %</label><input data-preset-number="reteivaRate" value="${preset.reteivaRate}" /></div>
+          <div class="field"><label>ReteICA %</label><input data-preset-number="reteicaRate" value="${preset.reteicaRate}" /></div>
+          <div class="field"><label>Cuenta gasto</label><input data-preset-field="accountExpense" value="${preset.accountExpense || ''}" /></div>
+          <div class="field"><label>Cuenta IVA</label><input data-preset-field="accountIva" value="${preset.accountIva || ''}" /></div>
+          <div class="field"><label>Cuenta proveedores</label><input data-preset-field="accountPayable" value="${preset.accountPayable || ''}" /></div>
+          <div class="field"><label>Cuenta retefuente</label><input data-preset-field="accountWithholding" value="${preset.accountWithholding || ''}" /></div>
+          <div class="field"><label>Cuenta reteIVA</label><input data-preset-field="accountReteiva" value="${preset.accountReteiva || ''}" /></div>
+          <div class="field"><label>Cuenta reteICA</label><input data-preset-field="accountReteica" value="${preset.accountReteica || ''}" /></div>
+          <div class="field full"><label>Notas</label><textarea data-preset-field="notes">${preset.notes || ''}</textarea></div>
+        </div>
+      `;
+      detail.querySelectorAll('[data-preset-field]').forEach(input => {
+        input.addEventListener('input', () => {
+          preset[input.dataset.presetField] = input.value;
+        });
+      });
+      detail.querySelectorAll('[data-preset-number]').forEach(input => {
+        input.addEventListener('input', () => {
+          preset[input.dataset.presetNumber] = parseFloat(input.value) || 0;
+        });
+      });
+    }
+
+    function renderReports() {
+      const { purchases, totals } = computeTotals();
+      document.getElementById('reportCards').innerHTML = `
+        <div class="card"><div class="metric-title">Compras del periodo</div><div class="metric-value">${formatCOP(totals.gross)}</div><div class="metric-note">Total bruto facturado.</div></div>
+        <div class="card"><div class="metric-title">IVA descontable</div><div class="metric-value">${formatCOP(totals.iva)}</div><div class="metric-note">Para revisión con el contador.</div></div>
+        <div class="card"><div class="metric-title">Retenciones</div><div class="metric-value">${formatCOP(totals.retefuente + totals.reteiva + totals.reteica)}</div><div class="metric-note">Suma de todas las retenciones de ejemplo.</div></div>
+      `;
+      const bySupplier = Object.entries(groupBy(purchases, row => row.provider?.name || 'Sin proveedor')).map(([name, rows]) => ({
+        name,
+        gross: rows.reduce((sum, row) => sum + row.computed.grossTotal, 0),
+        net: rows.reduce((sum, row) => sum + row.computed.netPayable, 0),
+        count: rows.length
+      }));
+      document.getElementById('reportBySupplier').innerHTML = bySupplier.map(item => `
+        <div class="report-item">
+          <div class="split"><strong>${item.name}</strong><strong>${formatCOP(item.net)}</strong></div>
+          <div class="subtle">${item.count} compra(s) · bruto ${formatCOP(item.gross)}</div>
+        </div>
+      `).join('');
+      const byFund = Object.entries(groupBy(purchases, row => `${row.item.fund} · ${row.item.costCenter}`)).map(([name, rows]) => ({
+        name,
+        net: rows.reduce((sum, row) => sum + row.computed.netPayable, 0)
+      }));
+      document.getElementById('reportByFund').innerHTML = byFund.map(item => `
+        <div class="report-item">
+          <div class="split"><strong>${item.name}</strong><strong>${formatCOP(item.net)}</strong></div>
+        </div>
+      `).join('');
+      document.getElementById('reportMonthlyTable').innerHTML = `
+        <table>
+          <thead><tr><th>Código</th><th>Proveedor</th><th>Documento</th><th>Base</th><th>IVA</th><th>Retenciones</th><th>Neto</th><th>Estado</th></tr></thead>
+          <tbody>
+            ${purchases.map(row => `
+              <tr>
+                <td>${row.item.code}</td>
+                <td>${row.provider?.name || 'Sin proveedor'}</td>
+                <td>${row.item.documentType}<br><span class="subtle">${row.item.documentNumber || 'Sin número'}</span></td>
+                <td>${formatCOP(row.computed.base)}</td>
+                <td>${formatCOP(row.computed.ivaAmount)}</td>
+                <td>${formatCOP(row.computed.totalRetentions)}</td>
+                <td>${formatCOP(row.computed.netPayable)}</td>
+                <td>${row.item.paymentStatus}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderAlertsAudit() {
+      const alerts = getAllAlerts();
+      document.getElementById('alertsFull').innerHTML = alerts.length ? alerts.map(alert => `
+        <div class="alert-item">
+          <div class="split"><strong>${alert.code}</strong><span class="badge ${alert.severity}">${alert.severity === 'danger' ? 'Alta' : 'Media'}</span></div>
+          <div class="subtle">${alert.concept} · ${alert.provider}</div>
+          <div style="margin-top:6px">${alert.text}</div>
+        </div>
+      `).join('') : '<div class="subtle">No hay alertas.</div>';
+
+      const audit = getAllAudit();
+      document.getElementById('auditFull').innerHTML = audit.length ? audit.map(entry => `
+        <div class="audit-item">
+          <div class="split"><strong>${entry.purchaseCode}</strong><span class="badge">${entry.user}</span></div>
+          <div>${entry.action}</div>
+          <div class="subtle">${entry.date} · ${entry.concept}</div>
+        </div>
+      `).join('') : '<div class="subtle">No hay auditoría.</div>';
+    }
+
+    function createNewProvider() {
+      const item = {
+        id: 'prov-' + Math.random().toString(36).slice(2, 8),
+        name: 'Nuevo proveedor',
+        nit: '',
+        type: 'Persona jurídica',
+        invoiceObligated: true,
+        ivaResponsible: true,
+        autoretenedor: false,
+        reteivaAgent: false,
+        municipality: 'Bogotá D.C.',
+        email: '',
+        phone: '',
+        comments: ''
+      };
+      appState.providers.unshift(item);
+      uiState.selectedProviderId = item.id;
+      persistState();
+      renderProviders();
+      renderPurchaseDetail();
+    }
+
+    function deleteSelectedPurchase() {
+      const purchase = getSelectedPurchase();
+      if (!purchase) {
+        alert('No hay registro seleccionado para eliminar.');
+        return;
+      }
+      if (!confirm(`¿Eliminar el registro ${purchase.code}?`)) return;
+      const index = appState.purchases.findIndex(item => item.id === purchase.id);
+      if (index === -1) return;
+      appState.purchases.splice(index, 1);
+      uiState.selectedPurchaseId = appState.purchases[0]?.id || null;
+      persistState();
+      renderAll();
+    }
+
+    function deleteSelectedProvider() {
+      const provider = getProvider(uiState.selectedProviderId);
+      if (!provider) {
+        alert('No hay proveedor seleccionado para eliminar.');
+        return;
+      }
+      const linked = appState.purchases.filter(item => item.providerId === provider.id);
+      if (linked.length && appState.providers.length === 1) {
+        alert('No puedes eliminar el único proveedor mientras existan compras asociadas.');
+        return;
+      }
+      let fallbackProviderId = null;
+      if (linked.length) {
+        const fallback = appState.providers.find(item => item.id !== provider.id);
+        if (!fallback) {
+          alert('Crea otro proveedor antes de eliminar este registro.');
+          return;
+        }
+        if (!confirm(`El proveedor está asociado a ${linked.length} compra(s). ¿Deseas eliminarlo y mover esas compras a ${fallback.name}?`)) return;
+        fallbackProviderId = fallback.id;
+      } else if (!confirm(`¿Eliminar el proveedor ${provider.name}?`)) {
+        return;
+      }
+      appState.providers = appState.providers.filter(item => item.id !== provider.id);
+      if (fallbackProviderId) {
+        appState.purchases.forEach(item => {
+          if (item.providerId === provider.id) item.providerId = fallbackProviderId;
+        });
+      } else {
+        appState.purchases.forEach(item => {
+          if (item.providerId === provider.id) item.providerId = '';
+        });
+      }
+      uiState.selectedProviderId = appState.providers[0]?.id || null;
+      persistState();
+      renderAll();
+    }
+
+    function exportReportsToExcel() {
+      const { purchases, totals } = computeTotals();
+      const supplierRows = Object.entries(groupBy(purchases, row => row.provider?.name || 'Sin proveedor')).map(([name, rows]) => ({
+        proveedor: name,
+        compras: rows.length,
+        bruto: rows.reduce((sum, row) => sum + row.computed.grossTotal, 0),
+        neto: rows.reduce((sum, row) => sum + row.computed.netPayable, 0)
+      }));
+      const fundRows = Object.entries(groupBy(purchases, row => `${row.item.fund} · ${row.item.costCenter}`)).map(([name, rows]) => ({
+        fondo: name,
+        neto: rows.reduce((sum, row) => sum + row.computed.netPayable, 0)
+      }));
+      const alertRows = getAllAlerts().map(alert => ({
+        codigo: alert.code,
+        proveedor: alert.provider,
+        severidad: alert.severity,
+        alerta: alert.text
+      }));
+      const sheets = [
+        { name: 'Resumen', headers: ['Indicador', 'Valor'], rows: [
+          ['Compras registradas', totals.purchases],
+          ['Total bruto', totals.gross],
+          ['IVA descontable', totals.iva],
+          ['ReteFuente', totals.retefuente],
+          ['ReteIVA', totals.reteiva],
+          ['ReteICA', totals.reteica],
+          ['Total neto', totals.net],
+          ['Pagado', totals.paid],
+          ['Saldo pendiente', totals.balance]
+        ]},
+        { name: 'Compras', headers: ['Código','Concepto','Proveedor','Documento','Número','Base','IVA','ReteFuente','ReteIVA','ReteICA','Neto','Estado de pago','Fondo','Centro de costo'], rows: purchases.map(row => [
+          row.item.code, row.item.concept, row.provider?.name || 'Sin proveedor', row.item.documentType, row.item.documentNumber || '', row.computed.base, row.computed.ivaAmount, row.computed.retefuenteAmount, row.computed.reteivaAmount, row.computed.reteicaAmount, row.computed.netPayable, row.item.paymentStatus, row.item.fund, row.item.costCenter
+        ])},
+        { name: 'Por proveedor', headers: ['Proveedor','Compras','Total bruto','Total neto'], rows: supplierRows.map(item => [item.proveedor, item.compras, item.bruto, item.neto])},
+        { name: 'Por fondo', headers: ['Fondo / Centro','Total neto'], rows: fundRows.map(item => [item.fondo, item.neto])},
+        { name: 'Alertas', headers: ['Código','Proveedor','Severidad','Alerta'], rows: alertRows.map(item => [item.codigo, item.proveedor, item.severidad, item.alerta])}
+      ];
+      const workbookXml = buildExcelWorkbook(sheets);
+      const blob = new Blob([workbookXml], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'reportes_contables_demo.xls';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function buildExcelWorkbook(sheets) {
+      const xmlEscape = value => String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+      const cellXml = value => {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return `<Cell><Data ss:Type="Number">${value}</Data></Cell>`;
+        }
+        return `<Cell><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`;
+      };
+      const worksheetXml = sheets.map(sheet => `
+        <Worksheet ss:Name="${xmlEscape(sheet.name)}">
+          <Table>
+            <Row>${sheet.headers.map(header => cellXml(header)).join('')}</Row>
+            ${sheet.rows.map(row => `<Row>${row.map(value => cellXml(value)).join('')}</Row>`).join('')}
+          </Table>
+        </Worksheet>
+      `).join('');
+      return `<?xml version="1.0"?>
+        <?mso-application progid="Excel.Sheet"?>
+        <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:html="http://www.w3.org/TR/REC-html40">
+          <Styles>
+            <Style ss:ID="Default" ss:Name="Normal">
+              <Alignment ss:Vertical="Bottom"/>
+              <Borders/>
+              <Font/>
+              <Interior/>
+              <NumberFormat/>
+              <Protection/>
+            </Style>
+          </Styles>
+          ${worksheetXml}
+        </Workbook>`;
+    }
+
+    function currentTimestamp() {
+      const now = new Date();
+      const pad = value => String(value).padStart(2, '0');
+      return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    }
+
+    function createNewPurchase() {
+      const provider = appState.providers[0];
+      const preset = appState.presets[0];
+      if (!provider) {
+        alert('Primero crea un proveedor para asociar el registro.');
+        uiState.activeTab = 'proveedores';
+        renderAll();
+        return;
+      }
+      const item = {
+        id: 'cmp-' + Math.random().toString(36).slice(2, 8),
+        code: 'COMP-' + String(Math.floor(Math.random() * 9000) + 1000),
+        concept: 'Nuevo registro local',
+        providerId: provider.id,
+        presetId: preset.id,
+        documentType: 'Factura electrónica',
+        documentNumber: '',
+        cufe: '',
+        accrualDate: '2026-03-24',
+        invoiceDate: '2026-03-24',
+        dueDate: '2026-03-31',
+        paymentDate: '',
+        paymentStatus: 'Pendiente',
+        paymentMethod: 'Transferencia',
+        fund: 'Pago iglesia',
+        costCenter: 'Sin asignar',
+        category: preset.category,
+        supplierSupport: '',
+        baseAmount: 0,
+        ivaRate: preset.ivaRate,
+        retefuenteRate: preset.retefuenteRate,
+        reteivaRate: preset.reteivaRate,
+        reteicaRate: preset.reteicaRate,
+        notes: '',
+        createdBy: 'Usuario local',
+        approvedBy: '',
+        paidBy: '',
+        receivedBy: '',
+        auditTrail: [
+          { date: currentTimestamp(), action: 'Creó un nuevo registro local', user: 'Usuario local' }
+        ]
+      };
+      appState.purchases.unshift(item);
+      uiState.selectedPurchaseId = item.id;
+      persistState();
+      renderAll();
+    }
+
+    function saveSelectedPurchase() {
+      const purchase = getSelectedPurchase();
+      if (!purchase) return;
+      purchase.auditTrail = purchase.auditTrail || [];
+      purchase.auditTrail.unshift({ date: currentTimestamp(), action: 'Guardó cambios del registro', user: 'Usuario local' });
+      persistState();
+      renderAll();
+      alert('Registro guardado en esta demo local.');
+    }
+
+    function saveSelectedProvider() {
+      if (!getProvider(uiState.selectedProviderId)) {
+        alert('No hay proveedor seleccionado.');
+        return;
+      }
+      persistState();
+      renderAll();
+      alert('Proveedor guardado localmente.');
+    }
+
+    function saveSelectedPreset() {
+      persistState();
+      renderAll();
+      alert('Preset guardado localmente.');
+    }
+
+    function bindGlobalActions() {
+      document.getElementById('newPurchaseBtn').addEventListener('click', createNewPurchase);
+      document.getElementById('deletePurchaseBtn').addEventListener('click', deleteSelectedPurchase);
+      document.getElementById('savePurchaseBtn').addEventListener('click', saveSelectedPurchase);
+      document.getElementById('newProviderBtn').addEventListener('click', createNewProvider);
+      document.getElementById('deleteProviderBtn').addEventListener('click', deleteSelectedProvider);
+      document.getElementById('saveProviderBtn').addEventListener('click', saveSelectedProvider);
+      document.getElementById('savePresetBtn').addEventListener('click', saveSelectedPreset);
+      document.getElementById('exportReportsBtn').addEventListener('click', exportReportsToExcel);
+    }
+
+    function renderAll() {
+      renderTabs();
+      renderDashboard();
+      renderPurchaseList();
+      renderPurchaseDetail();
+      renderProviders();
+      renderPresets();
+      renderReports();
+      renderAlertsAudit();
+    }
+
+    bindGlobalActions();
+    renderAll();
+  </script>
+</body>
+</html>
