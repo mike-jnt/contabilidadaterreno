@@ -668,7 +668,6 @@
           paymentDate: '2026-03-15',
           paymentStatus: 'Pagada total',
           paymentMethod: 'Transferencia',
-          accountType: 'Cuenta iglesia',
           fund: 'Ofrenda',
           costCenter: 'Alimentos / domingo',
           category: 'Mercado y suministros',
@@ -704,7 +703,6 @@
           paymentDate: '',
           paymentStatus: 'Pendiente',
           paymentMethod: 'Transferencia',
-          accountType: 'Cuenta iglesia',
           fund: 'Pago iglesia',
           costCenter: 'Administración',
           category: 'Servicios',
@@ -739,7 +737,6 @@
           paymentDate: '2026-03-10',
           paymentStatus: 'Pagada parcial',
           paymentMethod: 'Efectivo',
-          accountType: 'Cuenta iglesia',
           fund: 'Pago iglesia',
           costCenter: 'Mantenimiento',
           category: 'Mantenimiento menor',
@@ -1069,14 +1066,9 @@
                     ${['Pendiente','Pagada parcial','Pagada total','Anulada'].map(status => `<option value="${status}" ${purchase.paymentStatus === status ? 'selected' : ''}>${status}</option>`).join('')}
                   </select>
                 </div>
-                <div class="field"><label>Tipo de pago</label>
+                <div class="field"><label>Método de pago</label>
                   <select data-field="paymentMethod">
-                    ${['Transferencia','Bancolombia','Tarjeta','Efectivo'].map(method => `<option value="${method}" ${purchase.paymentMethod === method ? 'selected' : ''}>${method}</option>`).join('')}
-                  </select>
-                </div>
-                <div class="field"><label>Cuenta</label>
-                  <select data-field="accountType">
-                    ${['Cuenta personal','Cuenta iglesia'].map(account => `<option value="${account}" ${purchase.accountType === account ? 'selected' : ''}>${account}</option>`).join('')}
+                    ${['Transferencia','Tarjeta','Efectivo','Caja menor'].map(method => `<option value="${method}" ${purchase.paymentMethod === method ? 'selected' : ''}>${method}</option>`).join('')}
                   </select>
                 </div>
                 <div class="field"><label>Fondo</label>
@@ -1162,8 +1154,7 @@
               <div class="totals-box">
                 <div class="totals-row"><span>Fondo</span><strong>${purchase.fund || 'Pendiente'}</strong></div>
                 <div class="totals-row"><span>Centro de costo</span><strong>${purchase.costCenter || 'Pendiente'}</strong></div>
-                <div class="totals-row"><span>Tipo pago</span><strong>${purchase.paymentMethod || 'Pendiente'}</strong></div>
-                <div class="totals-row"><span>Cuenta</span><strong>${purchase.accountType || 'Pendiente'}</strong></div>
+                <div class="totals-row"><span>Método pago</span><strong>${purchase.paymentMethod || 'Pendiente'}</strong></div>
                 <div class="totals-row"><span>Categoría</span><strong>${purchase.category || 'Pendiente'}</strong></div>
               </div>
             </div>
@@ -1688,7 +1679,6 @@
         paymentDate: '',
         paymentStatus: 'Pendiente',
         paymentMethod: 'Transferencia',
-        accountType: 'Cuenta iglesia',
         fund: 'Pago iglesia',
         costCenter: 'Sin asignar',
         category: preset.category,
